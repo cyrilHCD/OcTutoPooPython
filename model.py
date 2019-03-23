@@ -1,5 +1,6 @@
 import json
 from math import pi
+import matplotlib.pyplot as plt
 
 class Agent:
 
@@ -111,7 +112,40 @@ class Zone:
          if not self.population:
              return 0
          return sum([inhabitant.agreeableness for inhabitant in self.inhabitants]) / self.population
-        
+class BaseGraph:
+
+    def __init__(self):
+        self.title = "Titre"
+        self.x_label = "X"
+        self.y_label = "Y"
+        self.show_grid = True
+
+    def show(self, zones):
+        x_values, y_values = self.xy_values(zones)
+        plt.plot(x_values, y_values, '.')
+        plt.xlabel(self.x_label)
+        plt.ylabel(self.y_label)
+        plt.title(self.title)
+        plt.grid(self.show_grid)
+        plt.show()
+
+    def xy_values(self, zones):
+        raise NotImplementedError
+
+class AgreeablenessGraph(BaseGraph):
+    def __init__(self):
+        super().__init__()
+        self.title = "Agréabilité"
+        self.x_label = "Densité de population"
+        self.y_label = "Agréabilité"
+
+    def xy_values(self, zones):
+        x_values = [zone.population_density() for zone in zones]
+        y_values = [zone.average_agreeableness() for zone in zones]
+        return x_values, y_values
+    
+
+ 
 def main():
     for agents_attributes in json.load(open("agents-100k.json")):
         latitude = agents_attributes.pop('latitude')
@@ -120,6 +154,11 @@ def main():
         agent = Agent(position, **agents_attributes)
         zone = Zone.find_zone_that_contains(position)
         zone.add_inhabitants(agent)
-        print(zone.average_agreeableness())
+
+    #graph initialize
+    agreeableness_graph = AgreeablenessGraph()
+    #show graph
+    agreeableness_graph.show(Zone.ZONES);
+    
 main()
 
