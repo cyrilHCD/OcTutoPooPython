@@ -1,9 +1,17 @@
+import json
+
 class Agent:
 
-    def __init__(self, agreeableness):
-        self.agreeableness = agreeableness
+    def __init__(self, **attr):
+        for attribute_name, attribute_value in attr.items():
+            setattr(self, attribute_name, attribute_value)
     
     def sayHello(self, str) :
         return "Hello " + str
-ag = Agent(1)
-print(ag.agreeableness)
+def main():    
+    for agents_attributes in json.load(open("agents-100k.json")):
+        agent = Agent(**agents_attributes)
+        print(agent.longitude)
+
+main()
+
